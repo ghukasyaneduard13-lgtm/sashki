@@ -1,1 +1,51 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#080b12">
+  <title>AURA DRIVE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="game"></div>
+
+  <div id="loading">
+    <h1>AURA DRIVE</h1>
+    <p>Загрузка игрового мира...</p>
+  </div>
+
+  <div id="interface">
+    <div id="top">
+      <div class="logo">AURA <span>DRIVE</span></div>
+      <div id="online">ONLINE: 1</div>
+    </div>
+
+    <div id="speed">0 <small>KM/H</small></div>
+
+    <div id="player-info">
+      <span>ИГРОК</span>
+      <strong id="nickname">DRIVER</strong>
+    </div>
+
+    <div id="controls">
+      <div class="steering">
+        <button id="left">◀</button>
+        <button id="right">▶</button>
+      </div>
+      <div class="pedals">
+        <button id="brake">▼</button>
+        <button id="gas">▲</button>
+      </div>
+    </div>
+
+    <div id="help">W A S D / СТРЕЛКИ — УПРАВЛЕНИЕ</div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="game.js"></script>
+
+</body>
+</html>
