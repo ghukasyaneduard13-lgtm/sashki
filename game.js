@@ -34,15 +34,14 @@ container.appendChild(renderer.domElement);
 
 createWorld(THREE, scene);
 
-const playerCar = createCar(THREE, 0);
-scene.add(playerCar);
-
-const remotePlayers = new Map();
-
 let speed = 0;
 let heading = 0;
 let selectedCar = 0;
 
+let playerCar = createCar(THREE, selectedCar);
+scene.add(playerCar);
+
+const remotePlayers = new Map();
 const keys = {};
 
 addEventListener("keydown", e => {
@@ -62,19 +61,35 @@ function bindButton(id, key) {
     button.setPointerCapture(e.pointerId);
   });
 
-  button.addEventListener("pointerup", () => {
+  function release() {
     keys[key] = false;
-  });
+  }
 
-  button.addEventListener("pointercancel", () => {
-    keys[key] = false;
-  });
+  button.addEventListener("pointerup", release);
+  button.addEventListener("pointercancel", release);
+  button.addEventListener("lostpointercapture", release);
 }
 
 bindButton("gas", "w");
 bindButton("brake", "s");
 bindButton("left", "a");
 bindButton("right", "d");
+
+// Выбор автомобиля
+document.getElementById("car").addEventListener("change", e => {
+  selectedCar = Number(e.target.value);
+
+  const x = playerCar.position.x;
+  const z = playerCar.position.z;
+
+  scene.remove(playerCar);
+
+  playerCar = createCar(THREE, selectedCar);
+  playerCar.position.set(x, 0, z);
+  playerCar.rotation.y = heading;
+
+  scene.add(playerCar);
+});
 
 const multiplayer = new Multiplayer({
   onPlayers(players) {
@@ -134,21 +149,6 @@ function removeRemotePlayer(id) {
   remotePlayers.delete(id);
 }
 
-document.getElementById("car").addEventListener("change", e => {
-  selectedCar = Number(e.target.value);
-
-  scene.remove(playerCar);
-
-  const newCar = createCar(THREE, selectedCar);
-  playerCar.clear();
-  playerCar.add(...newCar.children);
-  playerCar.position.set(
-    playerCar.position.x,
-    0,
-    playerCar.position.z
-  );
-});
-
 const clock = new THREE.Clock();
 let networkTimer = 0;
 
@@ -193,7 +193,10 @@ function animate() {
     playerCar.position.z - Math.cos(heading) * 10
   );
 
-  camera.position.lerp(targetCamera, 1 - Math.exp(-5 * dt));
+  camera.position.lerp(
+    targetCamera,
+    1 - Math.exp(-5 * dt)
+  );
 
   camera.lookAt(
     playerCar.position.x,
@@ -205,7 +208,10 @@ function animate() {
     const target = car.userData.targetPosition;
 
     if (target) {
-      car.position.lerp(target, 1 - Math.exp(-10 * dt));
+      car.position.lerp(
+        target,
+        1 - Math.exp(-10 * dt)
+      );
     }
 
     if (car.userData.targetRotation !== undefined) {
@@ -240,7 +246,6 @@ function animate() {
 }
 
 multiplayer.connect();
-
 animate();
 
 addEventListener("resize", () => {
