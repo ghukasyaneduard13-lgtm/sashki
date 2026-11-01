@@ -11,10 +11,7 @@ scene.background = new THREE.Color(0x91b8d4);
 scene.fog = new THREE.Fog(0x91b8d4, 100, 550);
 
 const camera = new THREE.PerspectiveCamera(
-  65,
-  innerWidth / innerHeight,
-  0.1,
-  1500
+  65, innerWidth / innerHeight, 0.1, 1500
 );
 
 const renderer = new THREE.WebGLRenderer({
@@ -75,7 +72,7 @@ bindButton("brake", "s");
 bindButton("left", "a");
 bindButton("right", "d");
 
-// Выбор автомобиля
+// Смена своей машины
 document.getElementById("car").addEventListener("change", e => {
   selectedCar = Number(e.target.value);
 
@@ -119,7 +116,11 @@ function addRemotePlayer(data) {
   car.rotation.y = data.rotation || 0;
 
   scene.add(car);
-  remotePlayers.set(data.id, car);
+
+  remotePlayers.set(data.id, {
+    object: car,
+    type: Number(data.car) || 0
+  });
 }
 
 function updateRemotePlayer(data) {
@@ -129,23 +130,41 @@ function updateRemotePlayer(data) {
     addRemotePlayer(data);
   }
 
-  const car = remotePlayers.get(data.id);
-  if (!car) return;
+  const player = remotePlayers.get(data.id);
+  if (!player) return;
 
-  car.userData.targetPosition = new THREE.Vector3(
-    data.x,
+  const newType = Number(data.car) || 0;
+
+  // Если игрок выбрал другую машину, меняем модель
+  if (player.type !== newType) {
+    const oldPosition = player.object.position.clone();
+    const oldRotation = player.object.rotation.y;
+
+    scene.remove(player.object);
+
+    player.object = createCar(THREE, newType);
+    player.object.position.copy(oldPosition);
+    player.object.rotation.y = oldRotation;
+
+    player.type = newType;
+
+    scene.add(player.object);
+  }
+
+  player.object.userData.targetPosition = new THREE.Vector3(
+    data.x || 0,
     0,
-    data.z
+    data.z || 0
   );
 
-  car.userData.targetRotation = data.rotation;
+  player.object.userData.targetRotation = data.rotation || 0;
 }
 
 function removeRemotePlayer(id) {
-  const car = remotePlayers.get(id);
-  if (!car) return;
+  const player = remotePlayers.get(id);
+  if (!player) return;
 
-  scene.remove(car);
+  scene.remove(player.object);
   remotePlayers.delete(id);
 }
 
@@ -204,14 +223,12 @@ function animate() {
     playerCar.position.z
   );
 
-  remotePlayers.forEach(car => {
+  remotePlayers.forEach(player => {
+    const car = player.object;
     const target = car.userData.targetPosition;
 
     if (target) {
-      car.position.lerp(
-        target,
-        1 - Math.exp(-10 * dt)
-      );
+      car.position.lerp(target, 1 - Math.exp(-10 * dt));
     }
 
     if (car.userData.targetRotation !== undefined) {
