@@ -58,6 +58,7 @@ border:1px solid #31506b;border-radius:7px;color:white;font-size:16px
 #loading{z-index:30}
 #main-menu.hidden{display:none}
 body.menu-open #interface{display:none}
+#car{pointer-events:auto}
 @media(max-width:700px){
 .brand{font-size:34px}
 .menu-layout{grid-template-columns:1fr;gap:18px}
@@ -90,7 +91,7 @@ body.menu-open #interface{display:none}
 <div class="menu-buttons">
 <button class="active" onclick="showPanel('home',this)">ГЛАВНАЯ</button>
 <button onclick="showPanel('garage',this)">ВЫБОР МАШИНЫ</button>
-<button onclick="showPanel('online',this)">ОНЛАЙН</button>
+<button onclick="showPanel('online-panel',this)">ОНЛАЙН</button>
 <button onclick="showPanel('settings',this)">НАСТРОЙКИ</button>
 </div>
 
@@ -111,12 +112,15 @@ body.menu-open #interface{display:none}
 <button class="car-option selected" onclick="chooseCar(0,this)">
 <strong>MAZDA 3</strong><small>Чёрная • 44СС550</small>
 </button>
+
 <button class="car-option" onclick="chooseCar(1,this)">
 <strong>MERCEDES W210 E320</strong><small>Чёрный • 44WW550</small>
 </button>
+
 <button class="car-option" onclick="chooseCar(2,this)">
 <strong>JEEP COMPASS</strong><small>Белый • 37NY727</small>
 </button>
+
 <button class="car-option" onclick="chooseCar(3,this)">
 <strong>MERCEDES CLS</strong><small>Чёрный • А777РА 77</small>
 </button>
@@ -125,12 +129,13 @@ body.menu-open #interface{display:none}
 <button class="primary" onclick="startGame()">ВЫЕХАТЬ</button>
 </div>
 
-<div class="panel" id="online" style="display:none">
+<div class="panel" id="online-panel" style="display:none">
 <h2>ОНЛАЙН</h2>
 <p class="description">Играй вместе с друзьями.</p>
 <button class="primary" onclick="showRoomInfo()">СОЗДАТЬ КОМНАТУ</button>
+
 <div id="room-panel">
-<p>Создание и подключение комнат появится после настройки серверной системы.</p>
+<p>Система онлайн-комнат будет подключена на следующем этапе.</p>
 <input id="room-code" placeholder="Код комнаты">
 <button class="primary" onclick="joinRoom()">ВОЙТИ ПО КОДУ</button>
 </div>
@@ -139,7 +144,7 @@ body.menu-open #interface{display:none}
 <div class="panel" id="settings" style="display:none">
 <h2>НАСТРОЙКИ</h2>
 <p class="description">Настройки игры.</p>
-<p>Графика: будет добавлен выбор качества.</p>
+<p>Графика: настройка качества будет добавлена.</p>
 <p>Управление: клавиатура и сенсорный экран.</p>
 </div>
 
@@ -151,6 +156,7 @@ body.menu-open #interface{display:none}
 <div id="interface">
 <div id="top">
 <div class="logo">AURA <span>DRIVE</span></div>
+
 <div style="display:flex;align-items:center;gap:10px;">
 <select id="car">
 <option value="0">MAZDA 3</option>
@@ -163,6 +169,7 @@ body.menu-open #interface{display:none}
 </div>
 
 <div id="speed">0 <small>KM/H</small></div>
+
 <div id="player-info">
 <span>ИГРОК</span>
 <strong id="nickname">DRIVER</strong>
@@ -173,6 +180,7 @@ body.menu-open #interface{display:none}
 <button id="left">◀</button>
 <button id="right">▶</button>
 </div>
+
 <div class="pedals">
 <button id="brake">▼</button>
 <button id="gas">▲</button>
@@ -186,21 +194,43 @@ body.menu-open #interface{display:none}
 let selectedCar=0;
 
 function showPanel(name,button){
-document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
+document.querySelectorAll(".panel").forEach(panel=>{
+panel.style.display="none";
+});
+
 document.getElementById(name).style.display="block";
-document.querySelectorAll(".menu-buttons button").forEach(b=>b.classList.remove("active"));
+
+document.querySelectorAll(".menu-buttons button").forEach(b=>{
+b.classList.remove("active");
+});
+
 button.classList.add("active");
 }
 
 function chooseCar(number,button){
 selectedCar=number;
-document.querySelectorAll(".car-option").forEach(b=>b.classList.remove("selected"));
+
+document.querySelectorAll(".car-option").forEach(b=>{
+b.classList.remove("selected");
+});
+
 button.classList.add("selected");
-document.getElementById("car").value=String(number);
+
+const selector=document.getElementById("car");
+selector.value=String(number);
+
+// Передаём выбранную машину игровому движку
+selector.dispatchEvent(new Event("change",{bubbles:true}));
 }
 
 function startGame(){
-document.getElementById("car").value=String(selectedCar);
+const selector=document.getElementById("car");
+
+selector.value=String(selectedCar);
+
+// Обновляем автомобиль перед началом поездки
+selector.dispatchEvent(new Event("change",{bubbles:true}));
+
 document.getElementById("main-menu").classList.add("hidden");
 document.body.classList.remove("menu-open");
 }
@@ -210,7 +240,7 @@ document.getElementById("room-panel").style.display="block";
 }
 
 function joinRoom(){
-alert("Система онлайн-комнат ещё не подключена. Это следующий этап разработки.");
+alert("Онлайн-комнаты пока не подключены. Это следующий этап разработки.");
 }
 </script>
 
