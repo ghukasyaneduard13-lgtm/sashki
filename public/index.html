@@ -2,60 +2,220 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#080b12">
-  <title>AURA DRIVE</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080b12">
+<title>AURA DRIVE</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080b12;color:white;font-family:Arial,sans-serif}
+#main-menu{
+position:fixed;inset:0;z-index:20;
+display:flex;align-items:center;justify-content:center;
+background:linear-gradient(90deg,#05070af5,#080b12cc),url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2000&q=85") center/cover;
+padding:20px;overflow:auto
+}
+.menu-content{width:100%;max-width:1100px}
+.brand{font-size:48px;font-weight:900;letter-spacing:7px;color:#fff}
+.brand span{color:#269dff}
+.subtitle{color:#9daec2;letter-spacing:4px;margin:8px 0 35px}
+.menu-layout{display:grid;grid-template-columns:260px 1fr;gap:35px}
+.menu-buttons{display:flex;flex-direction:column;gap:12px}
+.menu-buttons button{
+padding:18px;text-align:left;border:1px solid #293b50;
+background:#0b1421dd;color:white;font-size:15px;
+font-weight:bold;letter-spacing:2px;cursor:pointer;border-radius:8px
+}
+.menu-buttons button:hover,.menu-buttons button.active{
+background:#087acb;border-color:#36aaff
+}
+.panel{background:#08111ddd;border:1px solid #25415c;border-radius:12px;padding:25px}
+.panel h2{margin:0 0 8px;font-size:25px}
+.description{color:#91a3b8;margin-bottom:22px}
+.cars{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.car-option{
+padding:18px;background:#111d2b;border:1px solid #26394d;
+border-radius:9px;cursor:pointer;color:white;text-align:left
+}
+.car-option.selected{border:2px solid #269dff;background:#10263a}
+.car-option strong{display:block;font-size:15px;margin-bottom:6px}
+.car-option small{color:#9eafc3}
+.primary{
+margin-top:22px;width:100%;padding:17px;border:0;border-radius:8px;
+background:#168ce0;color:white;font-size:17px;font-weight:bold;
+letter-spacing:2px;cursor:pointer
+}
+.primary:hover{background:#36aaff}
+#room-panel{display:none;margin-top:15px}
+#room-panel input{
+width:100%;padding:14px;margin-top:10px;background:#101d2b;
+border:1px solid #31506b;border-radius:7px;color:white;font-size:16px
+}
+#game{position:fixed;inset:0;z-index:1}
+#interface{z-index:5}
+#loading{z-index:30}
+#main-menu.hidden{display:none}
+body.menu-open #interface{display:none}
+@media(max-width:700px){
+.brand{font-size:34px}
+.menu-layout{grid-template-columns:1fr;gap:18px}
+.menu-buttons{display:grid;grid-template-columns:1fr 1fr}
+.menu-buttons button{padding:14px;font-size:12px}
+.panel{padding:17px}
+.cars{grid-template-columns:1fr 1fr}
+.car-option{padding:12px}
+}
+</style>
 </head>
-<body>
 
-  <div id="game"></div>
+<body class="menu-open">
 
-  <div id="loading">
-    <h1>AURA DRIVE</h1>
-    <p>Загрузка игрового мира...</p>
-  </div>
+<div id="game"></div>
 
-  <div id="interface">
-    <div id="top">
-      <div class="logo">AURA <span>DRIVE</span></div>
+<div id="loading">
+<h1>AURA DRIVE</h1>
+<p>Загрузка игрового мира...</p>
+</div>
 
-      <div style="display:flex;align-items:center;gap:10px;">
-        <select id="car">
-          <option value="0">MAZDA 3</option>
-          <option value="1">MERCEDES W210 E320</option>
-          <option value="2">JEEP COMPASS</option>
-          <option value="3">MERCEDES CLS</option>
-        </select>
-        <div id="online">ONLINE: 1</div>
-      </div>
-    </div>
+<div id="main-menu">
+<div class="menu-content">
 
-    <div id="speed">0 <small>KM/H</small></div>
+<div class="brand">AURA <span>DRIVE</span></div>
+<div class="subtitle">OPEN WORLD • ONLINE DRIVING</div>
 
-    <div id="player-info">
-      <span>ИГРОК</span>
-      <strong id="nickname">DRIVER</strong>
-    </div>
+<div class="menu-layout">
 
-    <div id="controls">
-      <div class="steering">
-        <button id="left">◀</button>
-        <button id="right">▶</button>
-      </div>
+<div class="menu-buttons">
+<button class="active" onclick="showPanel('home',this)">ГЛАВНАЯ</button>
+<button onclick="showPanel('garage',this)">ВЫБОР МАШИНЫ</button>
+<button onclick="showPanel('online',this)">ОНЛАЙН</button>
+<button onclick="showPanel('settings',this)">НАСТРОЙКИ</button>
+</div>
 
-      <div class="pedals">
-        <button id="brake">▼</button>
-        <button id="gas">▲</button>
-      </div>
-    </div>
+<div>
 
-    <div id="help">W A S D / СТРЕЛКИ — УПРАВЛЕНИЕ</div>
-  </div>
+<div class="panel" id="home">
+<h2>Добро пожаловать!</h2>
+<p class="description">Добро пожаловать в мир AURA DRIVE.</p>
+<p>Выбирай автомобиль, исследуй город и встречай других игроков.</p>
+<button class="primary" onclick="startGame()">ИГРАТЬ</button>
+</div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script type="module" src="game.js"></script>
+<div class="panel" id="garage" style="display:none">
+<h2>ГАРАЖ</h2>
+<p class="description">Выбери автомобиль для поездки.</p>
+
+<div class="cars">
+<button class="car-option selected" onclick="chooseCar(0,this)">
+<strong>MAZDA 3</strong><small>Чёрная • 44СС550</small>
+</button>
+<button class="car-option" onclick="chooseCar(1,this)">
+<strong>MERCEDES W210 E320</strong><small>Чёрный • 44WW550</small>
+</button>
+<button class="car-option" onclick="chooseCar(2,this)">
+<strong>JEEP COMPASS</strong><small>Белый • 37NY727</small>
+</button>
+<button class="car-option" onclick="chooseCar(3,this)">
+<strong>MERCEDES CLS</strong><small>Чёрный • А777РА 77</small>
+</button>
+</div>
+
+<button class="primary" onclick="startGame()">ВЫЕХАТЬ</button>
+</div>
+
+<div class="panel" id="online" style="display:none">
+<h2>ОНЛАЙН</h2>
+<p class="description">Играй вместе с друзьями.</p>
+<button class="primary" onclick="showRoomInfo()">СОЗДАТЬ КОМНАТУ</button>
+<div id="room-panel">
+<p>Создание и подключение комнат появится после настройки серверной системы.</p>
+<input id="room-code" placeholder="Код комнаты">
+<button class="primary" onclick="joinRoom()">ВОЙТИ ПО КОДУ</button>
+</div>
+</div>
+
+<div class="panel" id="settings" style="display:none">
+<h2>НАСТРОЙКИ</h2>
+<p class="description">Настройки игры.</p>
+<p>Графика: будет добавлен выбор качества.</p>
+<p>Управление: клавиатура и сенсорный экран.</p>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="interface">
+<div id="top">
+<div class="logo">AURA <span>DRIVE</span></div>
+<div style="display:flex;align-items:center;gap:10px;">
+<select id="car">
+<option value="0">MAZDA 3</option>
+<option value="1">MERCEDES W210 E320</option>
+<option value="2">JEEP COMPASS</option>
+<option value="3">MERCEDES CLS</option>
+</select>
+<div id="online">ONLINE: 1</div>
+</div>
+</div>
+
+<div id="speed">0 <small>KM/H</small></div>
+<div id="player-info">
+<span>ИГРОК</span>
+<strong id="nickname">DRIVER</strong>
+</div>
+
+<div id="controls">
+<div class="steering">
+<button id="left">◀</button>
+<button id="right">▶</button>
+</div>
+<div class="pedals">
+<button id="brake">▼</button>
+<button id="gas">▲</button>
+</div>
+</div>
+
+<div id="help">W A S D / СТРЕЛКИ — УПРАВЛЕНИЕ</div>
+</div>
+
+<script>
+let selectedCar=0;
+
+function showPanel(name,button){
+document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
+document.getElementById(name).style.display="block";
+document.querySelectorAll(".menu-buttons button").forEach(b=>b.classList.remove("active"));
+button.classList.add("active");
+}
+
+function chooseCar(number,button){
+selectedCar=number;
+document.querySelectorAll(".car-option").forEach(b=>b.classList.remove("selected"));
+button.classList.add("selected");
+document.getElementById("car").value=String(number);
+}
+
+function startGame(){
+document.getElementById("car").value=String(selectedCar);
+document.getElementById("main-menu").classList.add("hidden");
+document.body.classList.remove("menu-open");
+}
+
+function showRoomInfo(){
+document.getElementById("room-panel").style.display="block";
+}
+
+function joinRoom(){
+alert("Система онлайн-комнат ещё не подключена. Это следующий этап разработки.");
+}
+</script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="game.js"></script>
 
 </body>
 </html>
