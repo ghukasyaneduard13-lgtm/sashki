@@ -20,7 +20,15 @@
   <div id="interface">
     <div id="top">
       <div class="logo">AURA <span>DRIVE</span></div>
-      <div id="online">ONLINE: 1</div>
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <select id="car">
+          <option value="0">AURA SPORT</option>
+          <option value="1">AURA RED</option>
+          <option value="2">AURA RACING</option>
+        </select>
+        <div id="online">ONLINE: 1</div>
+      </div>
     </div>
 
     <div id="speed">0 <small>KM/H</small></div>
@@ -35,6 +43,7 @@
         <button id="left">◀</button>
         <button id="right">▶</button>
       </div>
+
       <div class="pedals">
         <button id="brake">▼</button>
         <button id="gas">▲</button>
